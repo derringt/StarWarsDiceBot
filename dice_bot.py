@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 import random
+import dice
+import re
 
 with open('private_token.txt', 'r') as f:
     token = f.readline().strip()
@@ -27,5 +29,24 @@ async def roll(dice : str):
 
     result = ', '.join(str(random.randint(1, limit)) for r in range(rolls))
     await bot.say(result)
+
+@bot.command()
+async def ffg(dice_roll : str):
+    """Rolls a set of FFG dice in abc format.
+
+       a = Ability
+       b = Boost
+       c = Challenge
+       d = Difficulty
+       f = Force
+       s = Setback
+
+       Example: aabdc = 2 ability, 1 boost, 1 difficulty, and 1 challenge"""
+
+    roll = re.search(r'^[abcdfs]+$', dice_roll)
+    if roll:
+        await bot.say(dice.display_results(dice.roll_string(dice_roll)))
+    else:
+        await bot.say('Needs to be in a valid format! See !help ffg for details.')
 
 bot.run(token)
